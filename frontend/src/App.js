@@ -6,6 +6,26 @@ import DayList from "./components/DayList";
 import Appointment from "./components/Appointment";
 import daysData from "./components/__mocks__/days.json";
 import appointmentsData from "./components/__mocks__/appointments.json";
+const express = require("express");
+const { Pool } = require("pg");
+const dotenv = require('dotenv');
+
+const app = express();
+
+dotenv.config();
+const dbCredentials = {
+  user: process.env.USER_DB,
+  host: process.env.HOST_DB,
+  database: process.env.NAME_DB,
+  password: process.env.PASSWORD_DB,
+  port: process.env.PORT_DB,
+};
+
+app.get("/days", (req, res) => {
+  const pool = new Pool(dbCredentials);
+  // do the pool, put days.id on a variable and pass it on Application function
+  // down bellow
+});
 
 export default function Application() {
   const [day, setDay] = useState("Monday");
