@@ -1,34 +1,63 @@
-import React, {useEffect, useState} from "react";
+import React, { useState, useEffect } from "react";
+
 import "./App.scss";
+
 import DayList from "./components/DayList";
 import Appointment from "./components/Appointment";
-// import daysData from "./components/__mocks__/days.json";
 import appointmentsData from "./components/__mocks__/appointments.json";
 import axios from "axios";
-import io from "socket.io-client";
-
-const socket = io({path: "http://localhost:8000/schedule"});
 
 export default function Application() {
   const [day, setDay] = useState(1);
   const [days, setDays] = useState([]);
   const [appointments, setAppointments] = useState(appointmentsData);
 
-  const sendM = () => {
-    socket.emit('send', 'HELLO');
-  };
-  
-  
+  useEffect(() => {
+    axios.get('http://localhost:8000/days')
+          .then((res) => {
+          　  console.log(res.data);
+            setDays(res.data)
+          })
+    
+  }, []);
 
-  
+  useEffect(() => {
+    axios.get(`http://localhost:8000/schedule/daysInterviews/${day}`)
+      .then((res) => {
+        console.log(res.data);
+        setAppointments(res.data)
+      })
+  }, [day])
+
 
   function bookInterview(id, interview) {
-
     console.log(id, interview);
-    sendM()
+    const isEdit = appointments[id].interview;
+    setAppointments((prev) => {
+      const appointment = {
+        ...prev[id],
+        interview: { ...interview },
+      };
+      const appointments = {
+        ...prev,
+        [id]: appointment,
+      };
+      return appointments;
+    });
+    if (!isEdit) {
+      setDays((prev) => {
+        const updatedDay = {
+          ...prev[day],
+          spots: prev[day].spots - 1,
+        };
+        const days = {
+          ...prev,
+          [day]: updatedDay,
+        };
+        return days;
+      });
     }
-  
-
+  }
   function cancelInterview(id) {
     setAppointments((prev) => {
       const updatedAppointment = {
@@ -53,23 +82,6 @@ export default function Application() {
       return days;
     });
   }
-
-  useEffect(() => {
-    axios.get('http://localhost:8000/schedule/getAllDays')
-          .then((res) => {
-          　  console.log(res.data);
-            setDays(res.data)
-          })
-    
-  }, [])
-
-  useEffect(() => {
-    axios.get(`http://localhost:8000/schedule/daysInterviews/${day}`)
-      .then((res) => {
-        console.log(res.data);
-      })
-  }, [day])
-
   return (
     <main className="layout">
       <section className="sidebar">

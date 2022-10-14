@@ -27,12 +27,11 @@ GROUP BY available.day_id
 ORDER BY id;
 `
 
-exports.appointmentEachDay = id => `
+exports.appointmentEachDay = ( id )=> `
 SELECT
   appointments.appointment_id as id,
   appointments.time as time,
-  interviews.interviewer_id as interviewer,
-  interviews.student_name as student
+  interviews.interview_id as interview_id
 FROM
   appointments
 LEFT JOIN
@@ -46,18 +45,4 @@ ON
 WHERE
   appointments.day_id = ${id}
 ORDER BY appointments.time;
-`
-
-exports.interviewsLIst = id => `
-SELECT
-    available.day_id as day,
-    COUNT(available) as spots
-FROM
-    available
-LEFT JOIN
-    interviewers
-ON available.interviewer_id = interviewers.interviewer_id;
-GROUP BY
-    available.day_id;
-  
 `

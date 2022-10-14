@@ -7,8 +7,6 @@ const { Server } = require('socket.io');
 const daysRouter = require("./routes/days_router");
 const scheduleRouter = require("./routes/schedule_router");
 
-
-
 app.use(cors());
 app.use(express.json());
 

@@ -1,37 +1,5 @@
-const {getDaysList, getOneDayData, appointmentEachDay, getDaysSpot} = require("../helper/syntax");
+const {appointmentEachDay} = require("../helper/syntax");
 const pool = require('../database');
-
-exports.editInterview = async (req, res) => {
-  try {
-    req.io.on("connection", (socket) => {
-      console.log("CONNECTED");
-      socket.on("send", (data) => {
-        console.log(data);
-      })
-    })
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-
-exports.getAllDays = async (req, res) => {
-  try {
-    const days = await pool.query("SELECT * FROM days");
-    const spots = await pool.query(getOneDayData);
-    days.rows.forEach( day => {
-      spots.rows.forEach (spot => {
-        if(spot.id === day.day_id) {
-          day.spots = spot.spots;
-        }
-      })
-    })
-    console.log(days.rows);
-    res.json(days.rows);
-  } catch (err) {
-    console.log(err.message);
-  }
-};
 
 exports.getAllInterviewers = async (req, res) => {
   try {
@@ -46,6 +14,14 @@ exports.getAppointment = async (req, res) => {
   try {
     const { id } = req.params;
     const appointments = await pool.query(appointmentEachDay(id));
+    for (const ap of appointments.rows) {
+      if(ap.interview_id != null) {
+        const interviews = await pool.query(`SELECT * FROM interviews WHERE ${ap.interview_id} = interviews.interview_id`);
+        ap.interview =interviews.rows[0];
+        const interviewer = await pool.query(`SELECT * FROM interviewers WHERE ${ap.interview.interviewer_id} = interviewers.interviewer_id`)
+        ap.interview.interviewer = interviewer.rows[0]
+      }
+    }
     const data = appointments.rows;
     res.json(data);
   } catch (err) {

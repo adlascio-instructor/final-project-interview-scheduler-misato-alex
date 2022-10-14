@@ -1,16 +1,6 @@
 const express = require('express');
-const {getAllDays,getAllInterviewers, getAppointment, createInterview, editInterview} = require("../controller/schedule_controller");
+const {getAllInterviewers, getAppointment, editInterview} = require("../controller/schedule_controller");
 const scheduleRouter = express.Router();
-
-//Edit interview
-scheduleRouter
-  .route('/')
-  .get(editInterview)
-
-//days
-scheduleRouter
-  .route('/getAllDays')
-  .get(getAllDays)
 
 //interviewers
 scheduleRouter
@@ -21,7 +11,5 @@ scheduleRouter
 scheduleRouter
   .route('/daysInterviews/:id')
   .get(getAppointment)
-
-
 
 module.exports = scheduleRouter;
