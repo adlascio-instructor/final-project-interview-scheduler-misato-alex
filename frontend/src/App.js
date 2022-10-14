@@ -1,64 +1,34 @@
-import React, { useState } from "react";
-
+import React, {useEffect, useState} from "react";
 import "./App.scss";
-
 import DayList from "./components/DayList";
 import Appointment from "./components/Appointment";
-import daysData from "./components/__mocks__/days.json";
+// import daysData from "./components/__mocks__/days.json";
 import appointmentsData from "./components/__mocks__/appointments.json";
-const express = require("express");
-const { Pool } = require("pg");
-const dotenv = require('dotenv');
+import axios from "axios";
+import io from "socket.io-client";
 
-const app = express();
-
-dotenv.config();
-const dbCredentials = {
-  user: process.env.USER_DB,
-  host: process.env.HOST_DB,
-  database: process.env.NAME_DB,
-  password: process.env.PASSWORD_DB,
-  port: process.env.PORT_DB,
-};
-
-app.get("/days", (req, res) => {
-  const pool = new Pool(dbCredentials);
-  // do the pool, put days.id on a variable and pass it on Application function
-  // down bellow
-});
+const socket = io({path: "http://localhost:8000/schedule"});
 
 export default function Application() {
-  const [day, setDay] = useState("Monday");
-  const [days, setDays] = useState(daysData);
+  const [day, setDay] = useState(1);
+  const [days, setDays] = useState([]);
   const [appointments, setAppointments] = useState(appointmentsData);
+
+  const sendM = () => {
+    socket.emit('send', 'HELLO');
+  };
+  
+  
+
+  
+
   function bookInterview(id, interview) {
+
     console.log(id, interview);
-    const isEdit = appointments[id].interview;
-    setAppointments((prev) => {
-      const appointment = {
-        ...prev[id],
-        interview: { ...interview },
-      };
-      const appointments = {
-        ...prev,
-        [id]: appointment,
-      };
-      return appointments;
-    });
-    if (!isEdit) {
-      setDays((prev) => {
-        const updatedDay = {
-          ...prev[day],
-          spots: prev[day].spots - 1,
-        };
-        const days = {
-          ...prev,
-          [day]: updatedDay,
-        };
-        return days;
-      });
+    sendM()
     }
-  }
+  
+
   function cancelInterview(id) {
     setAppointments((prev) => {
       const updatedAppointment = {
@@ -83,6 +53,23 @@ export default function Application() {
       return days;
     });
   }
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/schedule/getAllDays')
+          .then((res) => {
+          　  console.log(res.data);
+            setDays(res.data)
+          })
+    
+  }, [])
+
+  useEffect(() => {
+    axios.get(`http://localhost:8000/schedule/daysInterviews/${day}`)
+      .then((res) => {
+        console.log(res.data);
+      })
+  }, [day])
+
   return (
     <main className="layout">
       <section className="sidebar">

@@ -6,7 +6,8 @@ const pool = new Pool({
   password: process.env.SQL_PASSWORD,
   host: "localhost",
   port: process.env.SQL_PORT,
-  database: process.env.SQL_DATABASE
+  database: "interviewer_scheduler"
 })
+
 
 module.exports = pool;
