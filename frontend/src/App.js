@@ -1,16 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import "./App.scss";
 
 import DayList from "./components/DayList";
 import Appointment from "./components/Appointment";
-import daysData from "./components/__mocks__/days.json";
 import appointmentsData from "./components/__mocks__/appointments.json";
+import axios from "axios";
 
 export default function Application() {
-  const [day, setDay] = useState("Monday");
-  const [days, setDays] = useState(daysData);
+  const [day, setDay] = useState(1);
+  const [days, setDays] = useState([]);
   const [appointments, setAppointments] = useState(appointmentsData);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/days')
+          .then((res) => {
+          　  console.log(res.data);
+            setDays(res.data)
+          })
+    
+  }, []);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8000/schedule/daysInterviews/${day}`)
+      .then((res) => {
+        console.log(res.data);
+        setAppointments(res.data)
+      })
+  }, [day])
+
+
   function bookInterview(id, interview) {
     console.log(id, interview);
     const isEdit = appointments[id].interview;
@@ -92,4 +111,3 @@ export default function Application() {
     </main>
   );
 }
-

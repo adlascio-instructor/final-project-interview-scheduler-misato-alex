@@ -31,3 +31,6 @@ JOIN
 ON
     available.day_id = days.day_id AND days.day_id=2
 GROUP BY days.day_id;
+
+
+INSERT INTO interviews (interview_id, interviewer_id, appointment_id, student_name) VALUES (2,2,2,'Taro');

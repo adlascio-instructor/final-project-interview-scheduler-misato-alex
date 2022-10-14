@@ -27,3 +27,4 @@ CREATE TABLE available(
     interviewer_id Int REFERENCES interviewers(interviewer_id),
     day_id Int REFERENCES days(day_id)
 );
+

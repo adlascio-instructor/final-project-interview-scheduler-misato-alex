@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Header from "./Header";
 import Show from "./Show";
 import Empty from "./Empty";
@@ -6,11 +6,15 @@ import Form from "./Form";
 import Confirm from "./Confirm";
 
 import "./styles.scss";
+import axios from "axios";
 
 const Appointment = (props) => {
   const [add, setAdd] = React.useState(false);
   const [edit, setEdit] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const [interviewers, setInterviewer] = React.useState([]);
+
   function save(name, interviewer) {
     const interview = {
       student: name,
@@ -19,13 +23,16 @@ const Appointment = (props) => {
     setEdit(false);
     props.bookInterview(interview);
   }
-  const interviewers = [
-    { id: 1, name: "Sylvia Palmer", avatar: "https://i.imgur.com/LpaY82x.png" },
-    { id: 2, name: "Tori Malcolm", avatar: "https://i.imgur.com/Nmx0Qxo.png" },
-    { id: 3, name: "Mildred Nazir", avatar: "https://i.imgur.com/T2WwVfS.png" },
-    { id: 4, name: "Cohana Roy", avatar: "https://i.imgur.com/FK8V841.jpg" },
-    { id: 5, name: "Sven Jones", avatar: "https://i.imgur.com/twYrpay.jpg" },
-  ];
+
+  useEffect(()=> {
+    axios.get('http://localhost:8000/schedule/getInterviewers')
+      .then((res) => {
+        setInterviewer(res.data)
+      })
+  }, []);
+
+  
+
   return (
     <article className="appointment">
       <Header time={props.time} />
@@ -41,7 +48,7 @@ const Appointment = (props) => {
           />
         ) : edit ? (
           <Form
-            student={props.interview.student}
+            student={props.interview.student_name}
             interviewer={props.interview.interviewer}
             interviewers={interviewers}
             onSave={save}
@@ -49,7 +56,7 @@ const Appointment = (props) => {
           />
         ) : (
           <Show
-            student={props.interview.student}
+            student={props.interview.student_name}
             interviewer={props.interview.interviewer}
             interviewers={interviewers}
             onEdit={() => setEdit(true)}

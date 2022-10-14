@@ -3,7 +3,7 @@ import InterviewerList from "../InterviewerList";
 import Button from "../Button";
 
 const Form = (props) => {
-  const [name, setName] = React.useState(props.student || "");
+  const [name, setName] = React.useState(props.student_name || "");
   const [interviewer, setInterviewer] = React.useState(
     props.interviewer || null
   );
@@ -37,7 +37,7 @@ const Form = (props) => {
         </form>
         <InterviewerList
           interviewers={props.interviewers}
-          value={interviewer && interviewer.id}
+          value={interviewer && interviewer.interviewer_id}
           onChange={setInterviewer}
         />
       </section>

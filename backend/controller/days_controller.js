@@ -1,33 +1,40 @@
 const pool = require('../database');
-require('dotenv').config();
+const {getOneDayData} = require("../helper/syntax");
 
-exports.getDays = async(req,res) => {
-    try {
-        const days = await pool.query("SELECT * FROM days");
-        res.json(days.rows);
-        console.log('days', days.rows);
-    } catch (err) {
-        console.log('get days error',err.message);
-    }
+exports.getAllDays = async (req, res) => {
+  try {
+    const days = await pool.query("SELECT * FROM days");
+    const spots = await pool.query(getOneDayData);
+    days.rows.forEach( day => {
+      spots.rows.forEach (spot => {
+        if(spot.id === day.day_id) {
+          day.spots = spot.spots;
+        }
+      })
+    })
+    res.json(days.rows);
+  } catch (err) {
+    console.log(err.message);
+  }
 };
 
-exports.getAppointments = async(req,res) => {
-    try {
-        const appointments = await pool.query("SELECT * FROM appointments");
-        res.json(appointments.rows);
-        console.log('appointments', appointments.rows);
-    } catch (err) {
-        console.log('get appointments error',err.value);
-    }
+exports.getAppointments = async (req, res) => {
+  try {
+    const appointments = await pool.query("SELECT * FROM appointments");
+    res.json(appointments.rows);
+    console.log('appointments', appointments.rows);
+  } catch (err) {
+    console.log('get appointments error', err.value);
+  }
 };
 
-exports.getAvailabe = async(req,res) => {
-    try {
-        const available = await pool.query("SELECT * FROM available");
-        res.json(available.rows);
-        console.log('appointments available', available.rows);
-    } catch (err) {
-        console.log('appointments available error',err.value);
-    }
+exports.getAvailabe = async (req, res) => {
+  try {
+    const available = await pool.query("SELECT * FROM available");
+    res.json(available.rows);
+    console.log('appointments available', available.rows);
+  } catch (err) {
+    console.log('appointments available error', err.value);
+  }
 };
 
