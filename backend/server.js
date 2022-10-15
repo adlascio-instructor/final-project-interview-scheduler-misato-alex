@@ -6,6 +6,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const daysRouter = require("./routes/days_router");
 const scheduleRouter = require("./routes/schedule_router");
+const {Sockets} = require("./socket");
 
 app.use(cors());
 app.use(express.json());
@@ -18,19 +19,9 @@ const io = new Server(server, {
   }
 });
 
-io.on("connection", (socket) => {
-  console.log("connection")
-})
-
-io.path("/schedule");
-
-app.use((req, res, next) => {
-  req.io = io;
-  return next();
-})
-
 app.use('/days', daysRouter);
 app.use('/schedule', scheduleRouter);
 
+Sockets(io);
 
 server.listen(port, () => console.log(`Server is running on port ${port}`));

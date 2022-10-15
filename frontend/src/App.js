@@ -6,58 +6,43 @@ import DayList from "./components/DayList";
 import Appointment from "./components/Appointment";
 import appointmentsData from "./components/__mocks__/appointments.json";
 import axios from "axios";
+import io from "socket.io-client"
 
 export default function Application() {
   const [day, setDay] = useState(1);
   const [days, setDays] = useState([]);
   const [appointments, setAppointments] = useState(appointmentsData);
 
+
   useEffect(() => {
     axios.get('http://localhost:8000/days')
-          .then((res) => {
-          　  console.log(res.data);
-            setDays(res.data)
-          })
+      .then((res) => {
+        setDays(res.data)
+      })
     
   }, []);
 
   useEffect(() => {
     axios.get(`http://localhost:8000/schedule/daysInterviews/${day}`)
       .then((res) => {
-        console.log(res.data);
         setAppointments(res.data)
       })
+
+    console.log(appointments);
   }, [day])
 
+  const socket = io("http://localhost:8000")
 
   function bookInterview(id, interview) {
     console.log(id, interview);
-    const isEdit = appointments[id].interview;
-    setAppointments((prev) => {
-      const appointment = {
-        ...prev[id],
-        interview: { ...interview },
-      };
-      const appointments = {
-        ...prev,
-        [id]: appointment,
-      };
-      return appointments;
-    });
-    if (!isEdit) {
-      setDays((prev) => {
-        const updatedDay = {
-          ...prev[day],
-          spots: prev[day].spots - 1,
-        };
-        const days = {
-          ...prev,
-          [day]: updatedDay,
-        };
-        return days;
-      });
-    }
+    //send server
+    socket.emit("create", { appointment_id: id, interview, day });
+    socket.on("receive_newAppoints", (data) => {
+      setAppointments(data)
+    })
   }
+
+
   function cancelInterview(id) {
     setAppointments((prev) => {
       const updatedAppointment = {
