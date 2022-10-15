@@ -1,6 +1,5 @@
 const {appointmentEachDay, getAppoints} = require("../helper/syntax");
 const pool = require('../database');
-const {getAppointments} = require("./days_controller");
 
 exports.getAllInterviewers = async (req, res) => {
   try {

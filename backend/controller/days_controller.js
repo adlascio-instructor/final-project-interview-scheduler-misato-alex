@@ -1,17 +1,10 @@
 const pool = require('../database');
-const {getOneDayData} = require("../helper/syntax");
+const {getOneDayData, getAllData} = require("../helper/syntax");
 
 exports.getAllDays = async (req, res) => {
   try {
     const days = await pool.query("SELECT * FROM days");
-    const spots = await pool.query(getOneDayData);
-    days.rows.forEach( day => {
-      spots.rows.forEach (spot => {
-        if(spot.id === day.day_id) {
-          day.spots = spot.spots;
-        }
-      })
-    })
+    await getAllData(days)
     res.json(days.rows);
   } catch (err) {
     console.log(err.message);

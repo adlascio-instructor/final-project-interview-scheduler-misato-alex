@@ -19,7 +19,6 @@ export default function Application() {
       .then((res) => {
         setDays(res.data)
       })
-    
   }, []);
 
   useEffect(() => {
@@ -27,46 +26,27 @@ export default function Application() {
       .then((res) => {
         setAppointments(res.data)
       })
-
-    console.log(appointments);
   }, [day])
+
+  useEffect(() => {
+    socket.on("receive_newAppoints", (data) => {
+      console.log(data)
+      setAppointments(data[0])
+      setDays(data[1])
+    })
+  }, [appointments])
 
   const socket = io("http://localhost:8000")
 
   function bookInterview(id, interview) {
-    console.log(id, interview);
     //send server
     socket.emit("create", { appointment_id: id, interview, day });
-    socket.on("receive_newAppoints", (data) => {
-      setAppointments(data)
-    })
   }
-
 
   function cancelInterview(id) {
-    setAppointments((prev) => {
-      const updatedAppointment = {
-        ...prev[id],
-        interview: null,
-      };
-      const appointments = {
-        ...prev,
-        [id]: updatedAppointment,
-      };
-      return appointments;
-    });
-    setDays((prev) => {
-      const updatedDay = {
-        ...prev[day],
-        spots: prev[day].spots + 1,
-      };
-      const days = {
-        ...prev,
-        [day]: updatedDay,
-      };
-      return days;
-    });
+    socket.emit("delete", {id})
   }
+
   return (
     <main className="layout">
       <section className="sidebar">

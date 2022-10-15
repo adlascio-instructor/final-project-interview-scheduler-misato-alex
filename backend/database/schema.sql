@@ -28,3 +28,14 @@ CREATE TABLE available(
     day_id Int REFERENCES days(day_id)
 );
 
+
+SELECT
+    5-COUNT(interviewer_id)
+FROM
+    appointments
+LEFT JOIN
+    interviews
+ON
+    appointments.appointment_id  = interviews.appointment_id
+GROUP BY
+    day_id;

@@ -14,18 +14,18 @@ GROUP BY days.day_id
 ORDER BY days.day_id;
 `
 
-exports.getOneDayData = `
+getOneDayData = `
 SELECT
-    available.day_id as id,
-    COUNT(available) as spots
+    day_id as id,
+    5-COUNT(interviewer_id) as spots
 FROM
-    available
-JOIN
-    interviewers
+    appointments
+LEFT JOIN
+    interviews
 ON
-    available.interviewer_id = interviewers.interviewer_id
-GROUP BY available.day_id
-ORDER BY id;
+    appointments.appointment_id  = interviews.appointment_id
+GROUP BY
+    day_id;
 `
 
 appointmentEachDay = ( id )=> `
@@ -47,6 +47,8 @@ WHERE
   appointments.day_id = ${id}
 ORDER BY appointments.time;
 `
+
+
 exports.createInterviewQuery = (interview_id, interviewer_id, appointment_id, student) =>` 
 INSERT INTO 
     interviews(interview_id, interviewer_id, appointment_id, student_name)
@@ -66,4 +68,16 @@ exports.getAppoints =async (id) => {
   }
   const data = appointments.rows;
   return data;
+}
+
+
+exports.getAllData = async (days) => {
+  const spots = await pool.query(getOneDayData);
+  days.rows.forEach( day => {
+    spots.rows.forEach (spot => {
+      if(spot.id === day.day_id) {
+        day.spots = spot.spots;
+      }
+    })
+  })
 }

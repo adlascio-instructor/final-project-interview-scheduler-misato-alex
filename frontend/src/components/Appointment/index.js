@@ -31,8 +31,6 @@ const Appointment = (props) => {
       })
   }, []);
 
-  
-
   return (
     <article className="appointment">
       <Header time={props.time} />
